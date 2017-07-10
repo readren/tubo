@@ -6,7 +6,6 @@ import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.Directives._
 
 import akka.stream.ActorMaterializer
-import akka.http.scaladsl.model.HttpResponse
 
 import scala.util.control.NonFatal
 import scala.util.{Failure, Success}

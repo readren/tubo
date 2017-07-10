@@ -3,8 +3,9 @@ package tubo
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import akka.http.scaladsl.{Http, HttpExt}
 import akka.http.scaladsl.server.Route
-import akka.stream.ActorMaterializer
 import akka.http.scaladsl.server.Directives._
+
+import akka.stream.ActorMaterializer
 
 import scala.concurrent.Future
 import scala.util.Failure
@@ -39,8 +40,8 @@ class Receptor(supervisor: ActorRef) extends Actor with ActorLogging {
 		val hostDestino = config.getString("tubo.destino.host")
 		val puertoDestino = config.getInt("tubo.destino.puerto")
 
-		val registradorRequests = new RegistradorRequests()
-		val registradorResponses = new RegistradorResponses()
+		val registradorRequests = new RegistradorRequests(this.actorSystem)
+		val registradorResponses = new RegistradorResponses(this.actorSystem)
 		val emisor: Emisor[RegistradorRequests.Etiqueta] = new Emisor(http, hostDestino, puertoDestino, registradorRequests.flujo, registradorResponses.flujo)(this.materializer)
 		this.fServerBinding = this.http.bindAndHandle(emisor.flujo, interface, port)
 		//		this.fServerBinding = this.http.bindAndHandle(this.handler, interface, port)

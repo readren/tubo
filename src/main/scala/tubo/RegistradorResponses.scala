@@ -1,6 +1,7 @@
 package tubo
 
 import akka.NotUsed
+import akka.actor.ActorSystem
 import akka.http.scaladsl.model.{HttpResponse, StatusCodes}
 import akka.stream.scaladsl.Flow
 
@@ -10,8 +11,10 @@ import scala.util.{Failure, Success, Try}
 /**
   * Created by Gustavo on 10-Jul-17.
   */
-class RegistradorResponses(paralelismo: Int = 8) {
-	val esAsinc = false
+class RegistradorResponses(actorSystem: ActorSystem, paralelismo: Int = 8) {
+	private val esAsinc = false
+	private val blockingIoDispatcher = this.actorSystem.dispatchers.lookup("tubo.blocking-io-dispatcher")
+
 
 	val flujo: Flow[(Try[HttpResponse], RegistradorRequests.Etiqueta), HttpResponse, NotUsed] = {
 		if (this.esAsinc) Flow[(Try[HttpResponse], RegistradorRequests.Etiqueta)].mapAsyncUnordered(paralelismo)(t => funcAsinc(t._1, t._2))
@@ -28,11 +31,11 @@ class RegistradorResponses(paralelismo: Int = 8) {
 
 	def funcAsinc(tResponse: Try[HttpResponse], etiqueta: RegistradorRequests.Etiqueta): Future[HttpResponse] = {
 		tResponse match {
-			case Success(respuesta) => Future.successful(respuesta)
 			case Failure(error) => Future.successful(HttpResponse(StatusCodes.BadGateway, entity = error.getMessage))
+			case Success(respuesta) => Future {
+				respuesta
+			}(blockingIoDispatcher)
 		}
-
 	}
-
 }
 

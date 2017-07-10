@@ -1,10 +1,8 @@
 package tubo
 
-import akka.NotUsed
-import akka.actor.ActorSystem
-import akka.stream.scaladsl.{Broadcast, Flow, GraphDSL, Keep, Source}
+import akka.stream.scaladsl.{Flow, GraphDSL}
 import akka.http.scaladsl.Http.HostConnectionPool
-import akka.http.scaladsl.{Http, HttpExt}
+import akka.http.scaladsl.HttpExt
 import akka.http.scaladsl.model.{HttpRequest, HttpResponse}
 import akka.stream.{ActorMaterializer, FlowShape}
 
