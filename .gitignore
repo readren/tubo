@@ -1,0 +1,19 @@
+# IDEs and editors
+/.idea
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+/bin/
+/.cache-main
+/.worksheet/
+
+/target
+/project/project/target
+/project/target
+
+/sbt-dist
+/sbt
+/sbt.bat
