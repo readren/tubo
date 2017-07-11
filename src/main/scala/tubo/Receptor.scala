@@ -4,8 +4,8 @@ import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import akka.http.scaladsl.{Http, HttpExt}
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.Directives._
-
 import akka.stream.ActorMaterializer
+import tubo.RegistradorRequests.Etiqueta
 
 import scala.concurrent.Future
 import scala.util.Failure
@@ -41,7 +41,7 @@ class Receptor(supervisor: ActorRef) extends Actor with ActorLogging {
 		val puertoDestino = config.getInt("tubo.destino.puerto")
 
 		val registradorRequests = new RegistradorRequests(this.actorSystem)
-		val flujoHaciaYDesdeElDestino = ingeniero.armarFlujoHaciaYDesdeElDestino(http, hostDestino, puertoDestino)
+		val flujoHaciaYDesdeElDestino = ingeniero.armarFlujoHaciaYDesdeElDestino[Etiqueta](http, hostDestino, puertoDestino)
 		val registradorResponses = new RegistradorResponses(this.actorSystem)
 		val flujoDesdeYHaciaElOrigen = ingeniero.armarFlujoDesdeYHaciaElOrigen(registradorRequests.flujo, flujoHaciaYDesdeElDestino, registradorResponses.flujo)
 
@@ -64,7 +64,7 @@ class Receptor(supervisor: ActorRef) extends Actor with ActorLogging {
 		case Apagar =>
 			log.info("El actor {} ha pedido que me apague", this.sender)
 			this.apagarServidorHttp {
-				() => supervisor ! Supervisor.ApagarTodo
+				() => this.supervisor ! Supervisor.ApagarTodo
 			}
 	}
 

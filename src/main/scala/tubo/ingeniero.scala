@@ -17,6 +17,8 @@ object ingeniero {
 											 http: HttpExt,
 											 hostDestino: String,
 											 puertoDestino: Int
+										 )(
+											 implicit am: ActorMaterializer
 										 ): Flow[(HttpRequest, T), (Try[HttpResponse], T), HostConnectionPool] = {
 		http.cachedHostConnectionPool[T](hostDestino, puertoDestino)
 	}
@@ -25,7 +27,9 @@ object ingeniero {
 											registradorRequests: Flow[HttpRequest, (HttpRequest, T), Any],
 											destino: Flow[(HttpRequest, T), (Try[HttpResponse], T), HostConnectionPool],
 											registradorResponses: Flow[(Try[HttpResponse], T), HttpResponse, Any]
-										)(implicit am: ActorMaterializer): Flow[HttpRequest, HttpResponse, HostConnectionPool] = {
+										)(
+											implicit am: ActorMaterializer
+										): Flow[HttpRequest, HttpResponse, HostConnectionPool] = {
 
 		val grafo = GraphDSL.create(registradorRequests, registradorResponses, destino)((_, _, c) => c) {
 			implicit builder =>
