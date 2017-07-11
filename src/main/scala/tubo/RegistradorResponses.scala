@@ -21,7 +21,7 @@ class RegistradorResponses(actorSystem: ActorSystem, paralelismo: Int = 8) {
 		else Flow.fromFunction(t => funcSinc(t._1, t._2))
 	}
 
-	def funcSinc(tResponse: Try[HttpResponse], etiqueta: RegistradorRequests.Etiqueta): HttpResponse = {
+	private def funcSinc(tResponse: Try[HttpResponse], etiqueta: RegistradorRequests.Etiqueta): HttpResponse = {
 		tResponse match {
 			case Success(respuesta) => respuesta
 			case Failure(error) => HttpResponse(StatusCodes.BadGateway, entity = error.getMessage)
@@ -29,7 +29,7 @@ class RegistradorResponses(actorSystem: ActorSystem, paralelismo: Int = 8) {
 
 	}
 
-	def funcAsinc(tResponse: Try[HttpResponse], etiqueta: RegistradorRequests.Etiqueta): Future[HttpResponse] = {
+	private def funcAsinc(tResponse: Try[HttpResponse], etiqueta: RegistradorRequests.Etiqueta): Future[HttpResponse] = {
 		tResponse match {
 			case Failure(error) => Future.successful(HttpResponse(StatusCodes.BadGateway, entity = error.getMessage))
 			case Success(respuesta) => Future {

@@ -22,7 +22,7 @@ class RegistradorRequests(actorSystem: ActorSystem, paralelismo: Int = 8) {
 	val flujo: Flow[HttpRequest, (HttpRequest, Etiqueta), NotUsed] =
 		Flow[HttpRequest].mapAsyncUnordered(paralelismo)(func)
 
-	def func(request: HttpRequest): Future[(HttpRequest, Etiqueta)] = {
+	private def func(request: HttpRequest): Future[(HttpRequest, Etiqueta)] = {
 		Future {
 			(request, 1L)
 		}(blockingIoDispatcher)

@@ -41,9 +41,11 @@ class Receptor(supervisor: ActorRef) extends Actor with ActorLogging {
 		val puertoDestino = config.getInt("tubo.destino.puerto")
 
 		val registradorRequests = new RegistradorRequests(this.actorSystem)
+		val flujoHaciaYDesdeElDestino = ingeniero.armarFlujoHaciaYDesdeElDestino(http, hostDestino, puertoDestino)
 		val registradorResponses = new RegistradorResponses(this.actorSystem)
-		val emisor: Emisor[RegistradorRequests.Etiqueta] = new Emisor(http, hostDestino, puertoDestino, registradorRequests.flujo, registradorResponses.flujo)(this.materializer)
-		this.fServerBinding = this.http.bindAndHandle(emisor.flujo, interface, port)
+		val flujoDesdeYHaciaElOrigen = ingeniero.armarFlujoDesdeYHaciaElOrigen(registradorRequests.flujo, flujoHaciaYDesdeElDestino, registradorResponses.flujo)
+
+		this.fServerBinding = this.http.bindAndHandle(flujoDesdeYHaciaElOrigen, interface, port)
 		//		this.fServerBinding = this.http.bindAndHandle(this.handler, interface, port)
 
 		this.fServerBinding.onComplete {
